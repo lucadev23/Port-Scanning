@@ -7,22 +7,30 @@
 #include <netdb.h>
 #include <string.h>
 
-int main(void){
-  char buffer[4096];	//message from Server
-  char message[1024];	//message to send to Server
+int main(int argc,char* argv[]){
   int sock;
   int port;
+  int lenght=0;
   struct sockaddr_in temp; 
   struct hostent *h;
-
+  
+  if(argc != 2){
+     printf("Usage: ./scanning <ipv4 address>\n");
+     return 0; 
+  }
+  lenght = strlen(argv[1]);
+  if(lenght < 7 || lenght > 15){
+     printf("Wrong IP Address\n");
+     return 0; 
+  } 
   temp.sin_family=AF_INET;
-  h=gethostbyname("192.168.1.1");
+  h=gethostbyname(argv[1]);
   if(h==0){
     printf("Gethostbyname failed\n");
     exit(1);
   }
   bcopy(h->h_addr,&temp.sin_addr,h->h_length);
-  for(port=1;port<8500;port++){
+  for(port=1;port<65535;port++){
      sock=socket(AF_INET,SOCK_STREAM,0);
      temp.sin_port=htons(port);
      if(connect(sock, (struct sockaddr*) &temp, sizeof(temp)) < 0){
@@ -31,21 +39,7 @@ int main(void){
 	continue;
      }
      else{
-        memset(buffer, '\0', sizeof(buffer));	// "clear" the buffer, setting it to null
-        strcpy(message,"");			// "clear" the message
-        if(write(sock,message,strlen(message))<0){	
-           printf("Impossible to send the message\n");
-           close(sock);
-           continue;
-        }  
-        printf("Message sent successfully to Port --> %d\n",port);
-  
-        /*if(read(sock,buffer,sizeof(buffer)) < 0) {
-           printf("Impossible to read the message.\n");
-           close(sock);
-           continue;
-        }
-        printf("Message received to Port %d --> %s\n",port, buffer);*/
+        printf("Active Port --> %d\n",port);
      }
      close(sock);
   }
