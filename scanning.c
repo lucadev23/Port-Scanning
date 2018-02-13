@@ -30,7 +30,7 @@ int main(int argc,char* argv[]){
     exit(1);
   }
   bcopy(h->h_addr,&temp.sin_addr,h->h_length);
-  for(port=1;port<65535;port++){
+  for(port=0;port<65536;port++){
      sock=socket(AF_INET,SOCK_STREAM,0);
      temp.sin_port=htons(port);
      if(connect(sock, (struct sockaddr*) &temp, sizeof(temp)) < 0){
